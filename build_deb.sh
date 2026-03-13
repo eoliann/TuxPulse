@@ -22,5 +22,5 @@ fi
 
 chmod 755 "$PKG_DIR/usr/bin/tuxpulse"
 
-dpkg-deb --build "$PKG_DIR" "$DIST_DIR/${APP_NAME}_${VERSION}_all.deb"
-echo "Built: $DIST_DIR/${APP_NAME}_${VERSION}_all.deb"
+dpkg-deb --build "$PKG_DIR" "$DIST_DIR/${APP_NAME}_${VERSION}.deb"
+echo "Built: $DIST_DIR/${APP_NAME}_${VERSION}.deb"
