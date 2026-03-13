@@ -1,20 +1,33 @@
 {
   "app-id": "ro.eoliann.TuxPulse",
-  "runtime": "org.kde.Platform",
-  "runtime-version": "6.6",
-  "sdk": "org.kde.Sdk",
+  "runtime": "org.freedesktop.Platform",
+  "runtime-version": "23.08",
+  "sdk": "org.freedesktop.Sdk",
   "command": "tuxpulse",
-
   "finish-args": [
     "--share=network",
     "--share=ipc",
     "--socket=x11",
     "--socket=wayland",
     "--device=dri",
+    "--talk-name=org.freedesktop.Flatpak",
     "--filesystem=home"
   ],
-
   "modules": [
+    {
+      "name": "python-deps",
+      "buildsystem": "simple",
+      "build-commands": [
+        "pip3 install --prefix=/app --no-index --find-links=/run/build/python-deps/python-wheels PyQt5 psutil matplotlib"
+      ],
+      "sources": [
+        {
+          "type": "dir",
+          "path": "python-wheels",
+          "dest": "python-wheels"
+        }
+      ]
+    },
     {
       "name": "tuxpulse",
       "buildsystem": "simple",

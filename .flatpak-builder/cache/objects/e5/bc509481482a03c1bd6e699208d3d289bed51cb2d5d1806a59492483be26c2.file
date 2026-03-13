@@ -1,0 +1,5 @@
+[Runtime]
+name=ro.eoliann.TuxPulse.Debug
+
+[ExtensionOf]
+ref=app/ro.eoliann.TuxPulse/x86_64/master

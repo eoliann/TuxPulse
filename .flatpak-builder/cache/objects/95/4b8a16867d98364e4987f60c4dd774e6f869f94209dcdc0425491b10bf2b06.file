@@ -1,0 +1,22 @@
+[Application]
+name=ro.eoliann.TuxPulse
+runtime=org.freedesktop.Platform/x86_64/23.08
+sdk=org.freedesktop.Sdk/x86_64/23.08
+command=tuxpulse
+
+[Context]
+shared=network;ipc;
+sockets=x11;wayland;
+devices=dri;
+filesystems=home;
+
+[Session Bus Policy]
+org.freedesktop.Flatpak=talk
+
+[Extension ro.eoliann.TuxPulse.Debug]
+directory=lib/debug
+autodelete=true
+no-autodownload=true
+
+[Build]
+built-extensions=ro.eoliann.TuxPulse.Debug;

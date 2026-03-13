@@ -1,0 +1,50 @@
+{
+  "id" : "ro.eoliann.TuxPulse",
+  "runtime" : "org.freedesktop.Platform",
+  "runtime-version" : "23.08",
+  "runtime-commit" : "065c61a337f78034498ad18e2707dacb6852823b150488b9f5c95e1548f70ab5",
+  "sdk" : "org.freedesktop.Sdk",
+  "sdk-commit" : "f7bd662b000ec1a857b81d8fc158295493cc79b7286bae2c99ee357ab7ef17db",
+  "command" : "tuxpulse",
+  "modules" : [
+    {
+      "name" : "python-deps",
+      "buildsystem" : "simple",
+      "sources" : [
+        {
+          "dest" : "python-wheels",
+          "path" : "python-wheels",
+          "type" : "dir"
+        }
+      ],
+      "build-commands" : [
+        "pip3 install --prefix=/app --no-index --find-links=/run/build/python-deps/python-wheels PyQt5 psutil matplotlib"
+      ]
+    },
+    {
+      "name" : "tuxpulse",
+      "buildsystem" : "simple",
+      "sources" : [
+        {
+          "path" : "..",
+          "type" : "dir"
+        }
+      ],
+      "build-commands" : [
+        "mkdir -p /app/share/tuxpulse",
+        "cp -r app /app/share/tuxpulse/",
+        "install -Dm755 flatpak/tuxpulse.sh /app/bin/tuxpulse"
+      ]
+    }
+  ],
+  "finish-args" : [
+    "--share=network",
+    "--share=ipc",
+    "--socket=x11",
+    "--socket=wayland",
+    "--device=dri",
+    "--talk-name=org.freedesktop.Flatpak",
+    "--filesystem=home"
+  ],
+  "source-date-epoch" : 1773425952
+}

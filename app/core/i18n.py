@@ -1,6 +1,6 @@
 TRANSLATIONS = {
     "en": {
-        "app_title": "TuxPulse v0.8",
+        "app_title": "TuxPulse",
         "app_name": "TuxPulse System Toolkit",
         "subtitle": "Update, cleanup and monitoring for Linux systems",
         "system_actions": "System Actions",
@@ -51,7 +51,7 @@ TRANSLATIONS = {
         "analyze_disk": "Analyze disk",
     },
     "ro": {
-        "app_title": "TuxPulse v0.8",
+        "app_title": "TuxPulse",
         "app_name": "TuxPulse System Toolkit",
         "subtitle": "Actualizare, curățare și monitorizare pentru sisteme Linux",
         "system_actions": "Acțiuni sistem",

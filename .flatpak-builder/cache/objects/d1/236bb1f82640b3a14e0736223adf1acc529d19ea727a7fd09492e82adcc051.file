@@ -1,0 +1,4 @@
+[Application]
+name=ro.eoliann.TuxPulse
+runtime=org.freedesktop.Platform/x86_64/23.08
+sdk=org.freedesktop.Sdk/x86_64/23.08
