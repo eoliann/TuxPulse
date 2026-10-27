@@ -11,6 +11,10 @@ on:
         description: "Release tag (empty = latest release)"
         default: ""
         required: false
+      dry_run:
+        description: "Only check that the bot can reach every chat (no message is sent)"
+        type: boolean
+        default: false
   release:
     types: [published]
 
@@ -39,7 +43,26 @@ jobs:
           fi
           jq -r '"Release: \(.name) (\(.tag_name)) \(.html_url)", (.assets[] | "Asset: \(.name)")' release.json
 
+      - name: Check chats (dry run)
+        if: ${{ inputs.dry_run }}
+        run: |
+          IFS=',' read -r -a CHAT_ARRAY <<< "${TG_CHATS}"
+          FAILED=0
+          for ITEM in "${CHAT_ARRAY[@]}"; do
+            CHAT_ID="$(echo "${ITEM%%:*}" | xargs)"
+            [ -z "$CHAT_ID" ] && continue
+            RESPONSE="$(curl -sS "https://api.telegram.org/bot${TG_BOT_TOKEN}/getChat" -d chat_id="${CHAT_ID}")"
+            if [ "$(echo "$RESPONSE" | jq -r '.ok')" = "true" ]; then
+              echo "OK: $(echo "$RESPONSE" | jq -r '.result | "\(.title) (\(.id)) forum=\(.is_forum // false)"')"
+            else
+              echo "::error::Cannot reach chat: $(echo "$RESPONSE" | jq -r '.description')"
+              FAILED=1
+            fi
+          done
+          exit $FAILED
+
       - name: Send Telegram notifications
+        if: ${{ !inputs.dry_run }}
         run: |
           if [ -z "${TG_BOT_TOKEN}" ] || [ -z "${TG_CHATS}" ]; then
             echo "::error::TG_BOT_TOKEN or TG_CHATS/TG_CHAT_ID secret is missing."
