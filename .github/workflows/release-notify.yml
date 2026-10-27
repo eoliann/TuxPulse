@@ -11,6 +11,10 @@ on:
         description: "Release tag (empty = latest release)"
         default: ""
         required: false
+      chats:
+        description: "Send only to these chats (comma-separated, e.g. @tuxpulse:10); empty = all configured chats"
+        default: ""
+        required: false
       dry_run:
         description: "Only check that the bot can reach every chat (no message is sent)"
         type: boolean
@@ -25,7 +29,7 @@ jobs:
     env:
       TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
       # Repo-ul are secretul TG_CHAT_ID; TG_CHATS (listă separată prin virgulă) are prioritate dacă există
-      TG_CHATS: ${{ secrets.TG_CHATS || secrets.TG_CHAT_ID }}
+      TG_CHATS: ${{ inputs.chats || secrets.TG_CHATS || secrets.TG_CHAT_ID }}
 
     steps:
       - name: Read release details
