@@ -2,6 +2,15 @@ name: Notify Telegram on Release
 
 on:
   workflow_dispatch:
+    inputs:
+      repo:
+        description: "Repository whose release is announced (owner/name)"
+        default: "eoliann/TuxPulse"
+        required: true
+      tag:
+        description: "Release tag (empty = latest release)"
+        default: ""
+        required: false
   release:
     types: [published]
 
@@ -11,63 +20,81 @@ jobs:
 
     env:
       TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
-      TG_CHATS: ${{ secrets.TG_CHATS }}
-      RELEASE_NAME: ${{ github.event.release.name || github.event.repository.name }}
-      RELEASE_TAG: ${{ github.event.release.tag_name || github.ref_name }}
-      RELEASE_URL: ${{ github.event.release.html_url || format('{0}/{1}/releases/latest', github.server_url, github.repository) }}
+      # Repo-ul are secretul TG_CHAT_ID; TG_CHATS (listă separată prin virgulă) are prioritate dacă există
+      TG_CHATS: ${{ secrets.TG_CHATS || secrets.TG_CHAT_ID }}
 
     steps:
-      - name: Send Telegram notifications
+      - name: Read release details
         env:
-          ASSET_URL1: ${{ github.event.release.assets && github.event.release.assets[0] && github.event.release.assets[0].browser_download_url || '' }}
-          ASSET_URL2: ${{ github.event.release.assets && github.event.release.assets[1] && github.event.release.assets[1].browser_download_url || '' }}
+          GH_TOKEN: ${{ github.token }}
+          INPUT_REPO: ${{ inputs.repo }}
+          INPUT_TAG: ${{ inputs.tag }}
         run: |
+          if [ "${GITHUB_EVENT_NAME}" = "release" ]; then
+            jq '.release' "$GITHUB_EVENT_PATH" > release.json
+          elif [ -n "$INPUT_TAG" ]; then
+            gh api "repos/${INPUT_REPO}/releases/tags/${INPUT_TAG}" > release.json
+          else
+            gh api "repos/${INPUT_REPO}/releases/latest" > release.json
+          fi
+          jq -r '"Release: \(.name) (\(.tag_name)) \(.html_url)", (.assets[] | "Asset: \(.name)")' release.json
+
+      - name: Send Telegram notifications
+        run: |
+          if [ -z "${TG_BOT_TOKEN}" ] || [ -z "${TG_CHATS}" ]; then
+            echo "::error::TG_BOT_TOKEN or TG_CHATS/TG_CHAT_ID secret is missing."
+            exit 1
+          fi
+
+          RELEASE_NAME="$(jq -r '.name // .tag_name' release.json)"
+          RELEASE_TAG="$(jq -r '.tag_name' release.json)"
+          RELEASE_URL="$(jq -r '.html_url' release.json)"
+
+          # TuxPulse2 nu e scris în Python, așa că descrierea diferă
+          if [[ "$RELEASE_URL" == *"/TuxPulse2/"* ]]; then
+            DESCRIPTION="👉 Un set de instrumente rapid pentru Linux, care include comenzi de administrare utile și ajustări pentru optimizarea și curățarea sistemului."
+          else
+            DESCRIPTION="👉 Un set de instrumente rapid pentru Linux, scris în Python, care include comenzi de administrare utile și ajustări pentru optimizarea și curățarea sistemului."
+          fi
+
           # Construim textul cu newline-uri reale (Telegram HTML nu acceptă <br>)
           TEXT="$(printf '%s\n' \
             '📢 <b>TuxPulse are o nouă versiune pe GitHub!</b>' \
             "<b>${RELEASE_NAME}</b> (tag: <code>${RELEASE_TAG}</code>)" \
             "" \
-            "👉 Un set de instrumente rapid pentru Linux, scris în Python, care include comenzi de administrare utile și ajustări pentru optimizarea și curățarea sistemului." \
+            "${DESCRIPTION}" \
             "Cod gratuit și curat, fără spyware, malware sau reclame." \
             "" \
             "👉 <a href=\"${RELEASE_URL}\">Mergi la pagina noii versiuni</a>" \
           )"
-          
-          # Adăugăm link-urile de descărcare doar dacă există
-          if [ -n "$ASSET_URL1" ]; then
-            TEXT+=$'\n'"⬇️ <a href=\"${ASSET_URL1}\">Descarcă fișierul de instalare</a>"
-          fi
-          
-          if [ -n "$ASSET_URL2" ]; then
-            TEXT+=$'\n'"⬇️ <a href=\"${ASSET_URL2}\">Descarcă fișierul portabil</a>"
-          fi
+
+          # Câte un link de descărcare pentru fiecare pachet (.deb / .rpm / Arch)
+          while IFS=$'\t' read -r NAME URL; do
+            [ -z "$URL" ] && continue
+            TEXT+=$'\n'"⬇️ <a href=\"${URL}\">Descarcă ${NAME}</a>"
+          done < <(jq -r '.assets[] | select(.name | test("[.](deb|rpm|pkg[.]tar[.](zst|xz))$")) | [.name, .browser_download_url] | @tsv' release.json)
 
           IFS=',' read -r -a CHAT_ARRAY <<< "${TG_CHATS}"
 
-          echo "TG_CHATS raw: >${TG_CHATS}<"
-
+          SENT=0
           for ITEM in "${CHAT_ARRAY[@]}"; do
             ITEM_TRIM=$(echo "$ITEM" | xargs)
             [ -z "$ITEM_TRIM" ] && continue
 
+            ARGS=(-d parse_mode="HTML" --data-urlencode "text=${TEXT}")
             if [[ "$ITEM_TRIM" == *":"* ]]; then
-              CHAT_ID="${ITEM_TRIM%%:*}"
-              THREAD_ID="${ITEM_TRIM##*:}"
-              curl -X POST "https://api.telegram.org/bot${TG_BOT_TOKEN}/sendMessage" \
-                -d chat_id="${CHAT_ID}" \
-                -d message_thread_id="${THREAD_ID}" \
-                -d parse_mode="HTML" \
-                --data-urlencode "text=${TEXT}"
+              ARGS+=(-d chat_id="${ITEM_TRIM%%:*}" -d message_thread_id="${ITEM_TRIM##*:}")
             else
-              CHAT_ID="$ITEM_TRIM"
-              curl -X POST "https://api.telegram.org/bot${TG_BOT_TOKEN}/sendMessage" \
-                -d chat_id="${CHAT_ID}" \
-                -d parse_mode="HTML" \
-                --data-urlencode "text=${TEXT}"
+              ARGS+=(-d chat_id="${ITEM_TRIM}")
+            fi
+
+            RESPONSE="$(curl -sS -X POST "https://api.telegram.org/bot${TG_BOT_TOKEN}/sendMessage" "${ARGS[@]}")"
+            if [ "$(echo "$RESPONSE" | jq -r '.ok')" = "true" ]; then
+              SENT=$((SENT+1))
+            else
+              echo "::error::Telegram rejected the message: $(echo "$RESPONSE" | jq -r '.description')"
             fi
           done
 
-
-
-
-
+          echo "Messages sent: ${SENT}"
+          [ "$SENT" -gt 0 ]
