@@ -64,17 +64,17 @@ tuxpulse-classic
 
 | Release | Date | DEB | RPM | Arch | Total |
 | --- | --- | ---: | ---: | ---: | ---: |
-| [v5.3](https://github.com/eoliann/TuxPulse/releases/tag/v5.3) | 2026-10-27 | 0 | 0 | 0 | **0** |
-| [pr-v6.0.2](https://github.com/eoliann/TuxPulse/releases/tag/pr-v6.0.2) _(pre-release)_ | 2026-04-12 | 8 | 4 | 2 | **14** |
+| [v5.4](https://github.com/eoliann/TuxPulse/releases/tag/v5.4) | 2026-10-27 | 0 | 0 | 0 | **0** |
+| [v5.3](https://github.com/eoliann/TuxPulse/releases/tag/v5.3) | 2026-10-27 | 4 | 1 | 1 | **6** |
+| [pr-v6.0.2](https://github.com/eoliann/TuxPulse/releases/tag/pr-v6.0.2) _(pre-release)_ | 2026-04-12 | 10 | 4 | 2 | **16** |
 | [pr-v6.0.1](https://github.com/eoliann/TuxPulse/releases/tag/pr-v6.0.1) _(pre-release)_ | 2026-04-11 | 5 | 4 | 1 | **10** |
 | [pr-v6.0.0](https://github.com/eoliann/TuxPulse/releases/tag/pr-v6.0.0) _(pre-release)_ | 2026-04-10 | 3 | 4 | 0 | **7** |
-| [v5.2](https://github.com/eoliann/TuxPulse/releases/tag/v5.2) | 2026-04-09 | 45 | 23 | 1 | **69** |
 
-#### All releases (18)
+#### All releases (19)
 
 | DEB | RPM | Arch | Total |
 | ---: | ---: | ---: | ---: |
-| **145** | **48** | **5** | **198** |
+| **151** | **49** | **6** | **206** |
 
 _Updated automatically every day by the `Update download stats` workflow._
 <!-- DOWNLOAD-STATS:END -->
