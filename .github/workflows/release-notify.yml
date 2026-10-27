@@ -115,7 +115,7 @@ jobs:
             if [ "$(echo "$RESPONSE" | jq -r '.ok')" = "true" ]; then
               SENT=$((SENT+1))
             else
-              echo "::error::Telegram rejected the message: $(echo "$RESPONSE" | jq -r '.description')"
+              echo "::error::Telegram rejected the message for ${ITEM_TRIM}: $(echo "$RESPONSE" | jq -r '.description')"
             fi
           done
 
