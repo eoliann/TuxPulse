@@ -1,0 +1,48 @@
+name: Build packages
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deb-rpm:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install build tools
+        run: sudo apt-get update && sudo apt-get install -y rpm
+
+      - name: Build DEB + RPM
+        run: |
+          chmod +x build_packages.sh
+          ./build_packages.sh
+          mkdir -p out
+          cp dist/*.deb out/tuxpulse.deb
+          cp dist/*.rpm out/tuxpulse.rpm
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: tuxpulse-deb-rpm
+          path: out/*
+
+  arch:
+    runs-on: ubuntu-latest
+    container: archlinux:latest
+    steps:
+      - name: Install build tools and dependencies
+        run: pacman -Syu --noconfirm --needed base-devel git python python-pyqt5 python-psutil python-matplotlib polkit
+
+      - uses: actions/checkout@v4
+
+      - name: Build Arch package
+        run: |
+          useradd -m builder
+          chown -R builder:builder "$GITHUB_WORKSPACE"
+          su builder -c "cd '$GITHUB_WORKSPACE' && bash build_arch.sh"
+          mkdir -p out
+          cp dist/*.pkg.tar.zst out/tuxpulse.pkg.tar.zst
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: tuxpulse-arch
+          path: out/*

@@ -27,6 +27,40 @@ The project currently includes:
 - packaging assets for **Arch Linux** in `packaging/arch/PKGBUILD`
 - helper, systemd and polkit assets in the repository for the secure execution model
 
+## Download
+
+[![Latest release](https://img.shields.io/github/v/release/eoliann/TuxPulse?style=plastic&label=latest)](https://github.com/eoliann/TuxPulse/releases/latest)
+[![Latest release downloads](https://img.shields.io/github/downloads/eoliann/TuxPulse/latest/total?style=plastic&label=latest%20downloads)](https://github.com/eoliann/TuxPulse/releases/latest)
+[![Total downloads](https://img.shields.io/github/downloads/eoliann/TuxPulse/total?style=plastic&label=total%20downloads)](https://github.com/eoliann/TuxPulse/releases)
+
+| Package | Distributions | Latest release downloads | Direct download |
+| --- | --- | --- | --- |
+| **DEB** | Debian / Ubuntu / Mint | ![DEB](https://img.shields.io/github/downloads/eoliann/TuxPulse/latest/tuxpulse.deb?style=plastic&label=deb) | [tuxpulse.deb](https://github.com/eoliann/TuxPulse/releases/latest/download/tuxpulse.deb) |
+| **RPM** | Fedora / openSUSE | ![RPM](https://img.shields.io/github/downloads/eoliann/TuxPulse/latest/tuxpulse.rpm?style=plastic&label=rpm) | [tuxpulse.rpm](https://github.com/eoliann/TuxPulse/releases/latest/download/tuxpulse.rpm) |
+| **Arch** | Arch / CachyOS / Manjaro | ![Arch](https://img.shields.io/github/downloads/eoliann/TuxPulse/latest/tuxpulse.pkg.tar.zst?style=plastic&label=arch) | [tuxpulse.pkg.tar.zst](https://github.com/eoliann/TuxPulse/releases/latest/download/tuxpulse.pkg.tar.zst) |
+
+### Download statistics
+
+<!-- DOWNLOAD-STATS:START -->
+#### Latest 5 releases
+
+| Release | Date | DEB | RPM | Arch | Total |
+| --- | --- | ---: | ---: | ---: | ---: |
+| [pr-v6.0.2](https://github.com/eoliann/TuxPulse/releases/tag/pr-v6.0.2) _(pre-release)_ | 2026-04-12 | 8 | 4 | 2 | **14** |
+| [pr-v6.0.1](https://github.com/eoliann/TuxPulse/releases/tag/pr-v6.0.1) _(pre-release)_ | 2026-04-11 | 5 | 4 | 1 | **10** |
+| [pr-v6.0.0](https://github.com/eoliann/TuxPulse/releases/tag/pr-v6.0.0) _(pre-release)_ | 2026-04-10 | 3 | 4 | 0 | **7** |
+| [v5.2](https://github.com/eoliann/TuxPulse/releases/tag/v5.2) | 2026-04-09 | 45 | 23 | 1 | **69** |
+| [v5.1](https://github.com/eoliann/TuxPulse/releases/tag/v5.1) | 2026-04-08 | 7 | 2 | 1 | **10** |
+
+#### All releases (17)
+
+| DEB | RPM | Arch | Total |
+| ---: | ---: | ---: | ---: |
+| **145** | **48** | **5** | **198** |
+
+_Updated automatically every day by the `Update download stats` workflow._
+<!-- DOWNLOAD-STATS:END -->
+
 ## Main features
 
 TuxPulse currently exposes the following main areas in the application:
@@ -93,7 +127,8 @@ TuxPulse currently exposes the following main areas in the application:
 
 - **DEB**: supported by `build_packages.sh`
 - **RPM**: supported by `build_packages.sh` when `rpmbuild` is installed
-- **Arch Linux**: repository scaffold exists through `packaging/arch/PKGBUILD`, but it is not yet built by the unified builder
+- **Arch Linux**: supported by `build_arch.sh` (native `makepkg` or via `podman`)
+- **CI**: the `Build packages` GitHub Actions workflow builds all three packages (DEB, RPM, Arch) for each release
 
 ## Requirements
 
@@ -257,5 +292,6 @@ For release consistency, update the version there before building packages.
 
 - `build_packages.sh` is the main packaging entry point for current DEB/RPM release work.
 - `build_deb.sh` remains in the repository, but it is better treated as a legacy / fallback script.
-- Arch support is already scaffolded in the repository, but should be aligned with the current version and packaging flow before publishing.
+- Arch packages are built by `build_arch.sh`; the version is read from `app/version.py`.
+- Download statistics in this README are refreshed daily by `scripts/update_download_stats.py`.
 - The README should be kept in sync whenever the package layout, dependencies or helper installation flow changes.
