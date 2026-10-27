@@ -9,7 +9,7 @@ import subprocess
 
 SOCKET_PATH = "/run/tuxpulse.sock"
 LOG_FILE = "/var/log/tuxpulse-helper.log"
-ALLOWED_BASE = {"apt", "pacman", "dnf", "zypper", "flatpak", "journalctl", "systemctl", "bash"}
+ALLOWED_BASE = {"apt", "pacman", "dnf", "zypper", "flatpak", "journalctl", "systemctl"}
 ALLOWED_PREFIXES = (
     ["apt", "install"],
     ["apt", "remove"],
@@ -30,7 +30,6 @@ ALLOWED_PREFIXES = (
     ["flatpak", "update"],
     ["journalctl", "--vacuum-time=7d"],
     ["systemctl"],
-    ["bash", "-lc"],
 )
 
 

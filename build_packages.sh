@@ -48,6 +48,8 @@ mkdir -p "$DEB_BUILD/usr/share/tuxpulse" "$DEB_BUILD/usr/bin" "$DEB_BUILD/usr/sh
          "$DEB_BUILD/usr/share/icons/hicolor/256x256/apps" "$DEB_BUILD/DEBIAN"
 
 cp -a "$ROOT_DIR/app" "$DEB_BUILD/usr/share/tuxpulse/"
+# Nu livrăm fișiere de backup sau bytecode în pachet
+find "$DEB_BUILD/usr/share/tuxpulse/app" \( -name "__pycache__" -o -name "*.bk" -o -name "*.bak" -o -name "*.pyc" \) -prune -exec rm -rf {} +
 
 cat > "$DEB_BUILD/usr/bin/tuxpulse" <<'LAUNCHER'
 #!/usr/bin/env bash
@@ -110,6 +112,7 @@ else
     mkdir -p "$RPM_BUILD/SPECS" "$RPM_BUILD/SOURCES"
 
     cp -a "$ROOT_DIR/app" "$RPM_BUILD/SOURCES/"
+    find "$RPM_BUILD/SOURCES/app" \( -name "__pycache__" -o -name "*.bk" -o -name "*.bak" -o -name "*.pyc" \) -prune -exec rm -rf {} +
 
     RPM_ICON_INSTALL=""
     RPM_ICON_FILE=""

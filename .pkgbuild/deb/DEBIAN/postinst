@@ -1,6 +1,0 @@
-#!/bin/sh
-set -e
-chmod 755 /usr/bin/tuxpulse
-update-desktop-database /usr/share/applications || true
-gtk-update-icon-cache /usr/share/icons/hicolor -f -q || true
-echo "TuxPulse v5.2 installed successfully."

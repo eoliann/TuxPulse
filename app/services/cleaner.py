@@ -80,9 +80,17 @@ def clean_target(target_name):
             return {
                 "kind": "command",
                 "command": [
-                    "sh",
-                    "-c",
-                    f'find "{path}" -mindepth 1 -maxdepth 1 -exec rm -rf {{}} +',
+                    "find",
+                    str(path),
+                    "-mindepth",
+                    "1",
+                    "-maxdepth",
+                    "1",
+                    "-exec",
+                    "rm",
+                    "-rf",
+                    "{}",
+                    "+",
                 ],
                 "requires_root": True,
             }
@@ -125,6 +133,18 @@ def run_clean_command(command, output_callback=None):
 
     if command is None:
         return 0
+
+    if isinstance(command, dict) and command.get("kind") == "orphans":
+        orphans = _list_orphan_packages(command.get("pm"))
+        if not orphans:
+            if output_callback:
+                output_callback("No orphan packages found.")
+            return 0
+        command = {
+            "kind": "command",
+            "command": _orphan_remove_command(command.get("pm"), orphans),
+            "requires_root": True,
+        }
 
     requires_root = False
     actual_command = command
@@ -171,16 +191,8 @@ def cleanup_orphan_packages():
             "requires_root": True,
         }
 
-    if pm == "pacman":
-        return {
-            "kind": "command",
-            "command": [
-                "bash",
-                "-lc",
-                'orphans=$(pacman -Qtdq 2>/dev/null || true); [ -n "$orphans" ] && pacman -Rns --noconfirm $orphans || true',
-            ],
-            "requires_root": True,
-        }
+    if pm in ("pacman", "zypper"):
+        return {"kind": "orphans", "pm": pm}
 
     if pm == "dnf":
         return {
@@ -189,15 +201,44 @@ def cleanup_orphan_packages():
             "requires_root": True,
         }
 
-    if pm == "zypper":
-        return {
-            "kind": "command",
-            "command": [
-                "bash",
-                "-lc",
-                "pkgs=$(zypper packages --unneeded 2>/dev/null | awk -F'|' '/^i/ {print $3}' | xargs); [ -n \"$pkgs\" ] && zypper --non-interactive remove --clean-deps $pkgs || true",
-            ],
-            "requires_root": True,
-        }
+    raise RuntimeError("Unsupported distribution.")
 
+
+def _list_orphan_packages(pm):
+    """Return orphan package names parsed in Python, never via a shell."""
+    if pm == "pacman":
+        proc = subprocess.run(
+            ["pacman", "-Qtdq"],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.DEVNULL,
+            text=True,
+        )
+        # pacman exits with 1 when there are no orphans
+        return [line.strip() for line in proc.stdout.splitlines() if line.strip()]
+
+    if pm == "zypper":
+        proc = subprocess.run(
+            ["zypper", "--non-interactive", "packages", "--unneeded"],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.DEVNULL,
+            text=True,
+        )
+        names = []
+        for line in proc.stdout.splitlines():
+            parts = [part.strip() for part in line.split("|")]
+            if len(parts) < 3 or not parts[0].startswith("i"):
+                continue
+            name = parts[2]
+            if name and name not in names:
+                names.append(name)
+        return names
+
+    return []
+
+
+def _orphan_remove_command(pm, packages):
+    if pm == "pacman":
+        return ["pacman", "-Rns", "--noconfirm", "--", *packages]
+    if pm == "zypper":
+        return ["zypper", "--non-interactive", "remove", "--clean-deps", *packages]
     raise RuntimeError("Unsupported distribution.")

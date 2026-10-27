@@ -1,3 +1,4 @@
+import shlex
 import subprocess
 
 from core.privilege import elevated_command
@@ -11,7 +12,7 @@ class CommandRunner:
         last_code = 0
         for cmd in commands:
             if isinstance(cmd, str):
-                command = cmd.split()
+                command = shlex.split(cmd)
             else:
                 command = list(cmd)
 

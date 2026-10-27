@@ -66,6 +66,7 @@ for item in app packaging assets LICENSE LICENSE.md README.md; do
     cp -a "$ROOT_DIR/$item" "$SRCROOT/"
   fi
 done
+find "$SRCROOT/app" \( -name "__pycache__" -o -name "*.bk" -o -name "*.bak" -o -name "*.pyc" \) -prune -exec rm -rf {} +
 
 cat > "$WORKSPACE/PKGBUILD" <<PKGEOF
 pkgname=${APP_NAME}

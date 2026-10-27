@@ -1,2 +1,0 @@
-#!/usr/bin/env bash
-exec python3 /usr/share/tuxpulse/app/main.py "$@"
