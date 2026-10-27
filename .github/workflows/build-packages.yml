@@ -46,3 +46,32 @@ jobs:
         with:
           name: tuxpulse-arch
           path: out/*
+
+  test-deb:
+    needs: deb-rpm
+    runs-on: ubuntu-latest
+    # Linux Mint 22.x se bazează pe Ubuntu 24.04
+    container: ubuntu:24.04
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: tuxpulse-deb-rpm
+          path: pkg
+
+      - name: Install alongside the latest TuxPulse2
+        env:
+          DEBIAN_FRONTEND: noninteractive
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          apt-get update -qq
+          apt-get install -y -qq curl ca-certificates jq >/dev/null
+          URL=$(curl -fsSL -H "Authorization: Bearer $GH_TOKEN" https://api.github.com/repos/eoliann/TuxPulse2/releases/latest \
+            | jq -r '.assets[] | select(.name | endswith(".deb")) | .browser_download_url' | head -n 1)
+          if [ -n "$URL" ]; then
+            curl -fsSLo /tmp/tuxpulse2.deb "$URL"
+            apt-get install -y /tmp/tuxpulse2.deb
+          fi
+          apt-get install -y "$PWD/pkg/tuxpulse.deb"
+          test -x /usr/bin/tuxpulse-classic
+          cd /usr/share/tuxpulse-classic/app
+          QT_QPA_PLATFORM=offscreen python3 -c "import sys; sys.path.insert(0, '.'); import ui_main; print('TuxPulse Classic imports OK')"

@@ -39,6 +39,24 @@ The project currently includes:
 | **RPM** | Fedora / openSUSE | ![RPM](https://img.shields.io/github/downloads/eoliann/TuxPulse/latest/tuxpulse.rpm?style=plastic&label=rpm) | [tuxpulse.rpm](https://github.com/eoliann/TuxPulse/releases/latest/download/tuxpulse.rpm) |
 | **Arch** | Arch / CachyOS / Manjaro | ![Arch](https://img.shields.io/github/downloads/eoliann/TuxPulse/latest/tuxpulse.pkg.tar.zst?style=plastic&label=arch) | [tuxpulse.pkg.tar.zst](https://github.com/eoliann/TuxPulse/releases/latest/download/tuxpulse.pkg.tar.zst) |
 
+> **Installed as `tuxpulse-classic`.** Since v5.4 this app installs the `tuxpulse-classic` command and a
+> **TuxPulse Classic** menu entry, so it can be installed side by side with
+> [TuxPulse2](https://github.com/eoliann/TuxPulse2) (v6.x), which uses the `tuxpulse` command.
+
+```bash
+# Debian / Ubuntu / Mint
+sudo apt install ./tuxpulse.deb
+
+# Fedora / openSUSE
+sudo dnf install ./tuxpulse.rpm
+
+# Arch / CachyOS / Manjaro
+sudo pacman -U ./tuxpulse.pkg.tar.zst
+
+# Run
+tuxpulse-classic
+```
+
 ### Download statistics
 
 <!-- DOWNLOAD-STATS:START -->
@@ -128,7 +146,7 @@ TuxPulse currently exposes the following main areas in the application:
 - **DEB**: supported by `build_packages.sh`
 - **RPM**: supported by `build_packages.sh` when `rpmbuild` is installed
 - **Arch Linux**: supported by `build_arch.sh` (native `makepkg` or via `podman`)
-- **CI**: the `Build packages` GitHub Actions workflow builds all three packages (DEB, RPM, Arch) for each release
+- **CI**: the `Build packages` GitHub Actions workflow builds all three packages (DEB, RPM, Arch) and test-installs the DEB on Ubuntu 24.04, side by side with the latest TuxPulse2
 
 ## Requirements
 
@@ -194,6 +212,13 @@ Expected output:
 dist/
 ├── tuxpulse_<version>_all.deb
 └── tuxpulse-<version>-1.<dist>.noarch.rpm
+```
+
+The Arch builder (`build_arch.sh`) produces:
+
+```text
+dist/
+└── tuxpulse-classic-<version>-1-any.pkg.tar.zst
 ```
 
 ### Legacy: DEB-only builder

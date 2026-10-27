@@ -5,6 +5,8 @@ APP_NAME="tuxpulse"
 ROOT_DIR="$(cd "$(dirname "$0")" && pwd)"
 VERSION_FILE="$ROOT_DIR/app/version.py"
 DIST_DIR="$ROOT_DIR/dist"
+# Identitate instalată separată de TuxPulse2 (pachetul tux-pulse), ca să poată coexista
+APP_ID="tuxpulse-classic"
 BUILD_DIR="$ROOT_DIR/.pkgbuild"
 
 echo "=== TuxPulse Package Builder ==="
@@ -44,26 +46,27 @@ mkdir -p "$DIST_DIR"
 echo "→ Se construiește pachetul DEB..."
 
 DEB_BUILD="$BUILD_DIR/deb"
-mkdir -p "$DEB_BUILD/usr/share/tuxpulse" "$DEB_BUILD/usr/bin" "$DEB_BUILD/usr/share/applications" \
+mkdir -p "$DEB_BUILD/usr/share/$APP_ID" "$DEB_BUILD/usr/bin" "$DEB_BUILD/usr/share/applications" \
          "$DEB_BUILD/usr/share/icons/hicolor/256x256/apps" "$DEB_BUILD/DEBIAN"
 
-cp -a "$ROOT_DIR/app" "$DEB_BUILD/usr/share/tuxpulse/"
+cp -a "$ROOT_DIR/app" "$DEB_BUILD/usr/share/$APP_ID/"
 # Nu livrăm fișiere de backup sau bytecode în pachet
-find "$DEB_BUILD/usr/share/tuxpulse/app" \( -name "__pycache__" -o -name "*.bk" -o -name "*.bak" -o -name "*.pyc" \) -prune -exec rm -rf {} +
+find "$DEB_BUILD/usr/share/$APP_ID/app" \( -name "__pycache__" -o -name "*.bk" -o -name "*.bak" -o -name "*.pyc" \) -prune -exec rm -rf {} +
 
-cat > "$DEB_BUILD/usr/bin/tuxpulse" <<'LAUNCHER'
+cat > "$DEB_BUILD/usr/bin/$APP_ID" <<LAUNCHER
 #!/usr/bin/env bash
-exec python3 /usr/share/tuxpulse/app/main.py "$@"
+exec python3 /usr/share/$APP_ID/app/main.py "\$@"
 LAUNCHER
-chmod 755 "$DEB_BUILD/usr/bin/tuxpulse"
+chmod 755 "$DEB_BUILD/usr/bin/$APP_ID"
 
-cat > "$DEB_BUILD/usr/share/applications/tuxpulse.desktop" <<'DESKTOP'
+cat > "$DEB_BUILD/usr/share/applications/$APP_ID.desktop" <<DESKTOP
 [Desktop Entry]
-Name=TuxPulse
+Name=TuxPulse Classic
 GenericName=System Maintenance
 Comment=Linux maintenance toolkit
-Exec=tuxpulse
-Icon=tuxpulse
+Exec=$APP_ID
+Icon=$APP_ID
+StartupWMClass=$APP_ID
 Terminal=false
 Type=Application
 Categories=System;Utility;Settings;
@@ -71,7 +74,7 @@ StartupNotify=true
 DESKTOP
 
 if [[ -f "$ROOT_DIR/assets/tuxpulse.png" ]]; then
-    cp "$ROOT_DIR/assets/tuxpulse.png" "$DEB_BUILD/usr/share/icons/hicolor/256x256/apps/tuxpulse.png"
+    cp "$ROOT_DIR/assets/tuxpulse.png" "$DEB_BUILD/usr/share/icons/hicolor/256x256/apps/$APP_ID.png"
 fi
 
 cat > "$DEB_BUILD/DEBIAN/control" <<EOF
@@ -88,7 +91,7 @@ EOF
 cat > "$DEB_BUILD/DEBIAN/postinst" <<EOF
 #!/bin/sh
 set -e
-chmod 755 /usr/bin/tuxpulse
+chmod 755 /usr/bin/$APP_ID
 update-desktop-database /usr/share/applications || true
 gtk-update-icon-cache /usr/share/icons/hicolor -f -q || true
 echo "TuxPulse v${VERSION} installed successfully."
@@ -117,9 +120,9 @@ else
     RPM_ICON_INSTALL=""
     RPM_ICON_FILE=""
     if [[ -f "$ROOT_DIR/assets/tuxpulse.png" ]]; then
-        cp "$ROOT_DIR/assets/tuxpulse.png" "$RPM_BUILD/SOURCES/tuxpulse.png"
-        RPM_ICON_INSTALL=$'if [ -f %{_sourcedir}/tuxpulse.png ]; then\n    cp %{_sourcedir}/tuxpulse.png %{buildroot}%{_datadir}/icons/hicolor/256x256/apps/\nfi'
-        RPM_ICON_FILE="%{_datadir}/icons/hicolor/256x256/apps/tuxpulse.png"
+        cp "$ROOT_DIR/assets/tuxpulse.png" "$RPM_BUILD/SOURCES/$APP_ID.png"
+        RPM_ICON_INSTALL=$'if [ -f %{_sourcedir}/tuxpulse-classic.png ]; then\n    cp %{_sourcedir}/tuxpulse-classic.png %{buildroot}%{_datadir}/icons/hicolor/256x256/apps/\nfi'
+        RPM_ICON_FILE="%{_datadir}/icons/hicolor/256x256/apps/$APP_ID.png"
     fi
 
     cat > "$RPM_BUILD/SPECS/$APP_NAME.spec" <<SPECFILE
@@ -138,23 +141,24 @@ TuxPulse - Linux maintenance toolkit.
 mkdir -p %{buildroot}%{_bindir}
 mkdir -p %{buildroot}%{_datadir}/applications
 mkdir -p %{buildroot}%{_datadir}/icons/hicolor/256x256/apps
-mkdir -p %{buildroot}%{_datadir}/tuxpulse
+mkdir -p %{buildroot}%{_datadir}/$APP_ID
 
-cp -a %{_sourcedir}/app %{buildroot}%{_datadir}/tuxpulse/
+cp -a %{_sourcedir}/app %{buildroot}%{_datadir}/$APP_ID/
 
-cat > %{buildroot}%{_bindir}/tuxpulse <<'LAUNCHER_EOF'
+cat > %{buildroot}%{_bindir}/$APP_ID <<'LAUNCHER_EOF'
 #!/usr/bin/env bash
-exec python3 %{_datadir}/tuxpulse/app/main.py "\$@"
+exec python3 %{_datadir}/$APP_ID/app/main.py "\$@"
 LAUNCHER_EOF
-chmod 755 %{buildroot}%{_bindir}/tuxpulse
+chmod 755 %{buildroot}%{_bindir}/$APP_ID
 
-cat > %{buildroot}%{_datadir}/applications/tuxpulse.desktop <<'DESKTOP_EOF'
+cat > %{buildroot}%{_datadir}/applications/$APP_ID.desktop <<'DESKTOP_EOF'
 [Desktop Entry]
-Name=TuxPulse
+Name=TuxPulse Classic
 GenericName=System Maintenance
 Comment=Linux maintenance toolkit
-Exec=tuxpulse
-Icon=tuxpulse
+Exec=$APP_ID
+Icon=$APP_ID
+StartupWMClass=$APP_ID
 Terminal=false
 Type=Application
 Categories=System;Utility;Settings;
@@ -168,10 +172,10 @@ update-desktop-database %{_datadir}/applications || true
 gtk-update-icon-cache %{_datadir}/icons/hicolor -f -q || true
 
 %files
-%{_bindir}/tuxpulse
-%{_datadir}/applications/tuxpulse.desktop
+%{_bindir}/$APP_ID
+%{_datadir}/applications/$APP_ID.desktop
 ${RPM_ICON_FILE}
-%{_datadir}/tuxpulse
+%{_datadir}/$APP_ID
 
 %changelog
 * $(LC_ALL=C date +"%a %b %d %Y") TuxPulse Team - $VERSION-1

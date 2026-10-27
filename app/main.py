@@ -32,9 +32,10 @@ from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QApplication
 from ui_main import MainWindow
 
-APP_DESKTOP_ID = "tuxpulse"   # trebuie să fie EXACT numele fișierului .desktop fără extensie
+APP_DESKTOP_ID = "tuxpulse-classic"   # trebuie să fie EXACT numele fișierului .desktop fără extensie
 APP_ICON_PATHS = [
     Path(__file__).resolve().parent / "assets" / "tuxpulse.png",
+    Path("/usr/share/icons/hicolor/256x256/apps/tuxpulse-classic.png"),
     Path("/usr/share/icons/hicolor/256x256/apps/tuxpulse.png"),
     Path("/usr/share/pixmaps/tuxpulse.png"),
 ]
@@ -48,7 +49,7 @@ def load_app_icon() -> QIcon:
 def main():
     app = QApplication(sys.argv)
     app.setApplicationName("TuxPulse")
-    app.setApplicationDisplayName("TuxPulse")
+    app.setApplicationDisplayName("TuxPulse Classic")
     app.setDesktopFileName(APP_DESKTOP_ID)
 
     icon = load_app_icon()

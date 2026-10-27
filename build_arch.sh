@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-APP_NAME="tuxpulse"
+# Nume separat de TuxPulse2 (care folosește pkgname tuxpulse), ca să poată coexista
+APP_NAME="tuxpulse-classic"
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 VERSION_FILE="$ROOT_DIR/app/version.py"
 DIST_DIR="$ROOT_DIR/dist"
@@ -85,43 +86,32 @@ sha256sums=()
 package() {
     cd "\$srcdir/${APP_NAME}-${VERSION}"
 
-    install -dm755 "\$pkgdir/usr/share/tuxpulse"
-    cp -a app "\$pkgdir/usr/share/tuxpulse/"
+    install -dm755 "\$pkgdir/usr/share/${APP_NAME}"
+    cp -a app "\$pkgdir/usr/share/${APP_NAME}/"
 
-    if [[ -f packaging/deb/usr/bin/tuxpulse ]]; then
-        install -Dm755 packaging/deb/usr/bin/tuxpulse "\$pkgdir/usr/bin/tuxpulse"
-    else
-        install -Dm755 /dev/stdin "\$pkgdir/usr/bin/tuxpulse" <<'LAUNCHER'
+    install -Dm755 /dev/stdin "\$pkgdir/usr/bin/${APP_NAME}" <<'LAUNCHER'
 #!/usr/bin/env bash
-export PYTHONPATH="/usr/share/tuxpulse/app"
-exec /usr/bin/python /usr/share/tuxpulse/app/main.py "\$@"
+export PYTHONPATH="/usr/share/${APP_NAME}/app"
+exec /usr/bin/python /usr/share/${APP_NAME}/app/main.py "\$@"
 LAUNCHER
-    fi
 
-    if [[ -f packaging/deb/usr/share/applications/tuxpulse.desktop ]]; then
-        install -Dm644 packaging/deb/usr/share/applications/tuxpulse.desktop \
-            "\$pkgdir/usr/share/applications/tuxpulse.desktop"
-    else
-        install -Dm644 /dev/stdin "\$pkgdir/usr/share/applications/tuxpulse.desktop" <<'DESKTOP'
+    install -Dm644 /dev/stdin "\$pkgdir/usr/share/applications/${APP_NAME}.desktop" <<'DESKTOP'
 [Desktop Entry]
 Type=Application
-Name=TuxPulse
-Comment=TuxPulse System Toolkit
-Exec=/usr/bin/tuxpulse
-Icon=tuxpulse
+Name=TuxPulse Classic
+GenericName=System Maintenance
+Comment=Linux maintenance toolkit
+Exec=/usr/bin/${APP_NAME}
+Icon=${APP_NAME}
 Terminal=false
 Categories=Utility;System;
 StartupNotify=true
-StartupWMClass=tuxpulse
+StartupWMClass=${APP_NAME}
 DESKTOP
-    fi
 
     if [[ -f assets/tuxpulse.png ]]; then
         install -Dm644 assets/tuxpulse.png \
-            "\$pkgdir/usr/share/icons/hicolor/256x256/apps/tuxpulse.png"
-    elif [[ -f packaging/deb/usr/share/icons/hicolor/256x256/apps/tuxpulse.png ]]; then
-        install -Dm644 packaging/deb/usr/share/icons/hicolor/256x256/apps/tuxpulse.png \
-            "\$pkgdir/usr/share/icons/hicolor/256x256/apps/tuxpulse.png"
+            "\$pkgdir/usr/share/icons/hicolor/256x256/apps/${APP_NAME}.png"
     fi
 }
 PKGEOF
@@ -129,10 +119,10 @@ PKGEOF
 cat > "$WORKSPACE/tuxpulse.install" <<'INSTEOF'
 post_install() {
   cat <<'MSG'
-TuxPulse was installed successfully.
+TuxPulse Classic was installed successfully.
 
 Run it with:
-  tuxpulse
+  tuxpulse-classic
 MSG
 }
 
