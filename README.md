@@ -74,7 +74,7 @@ tuxpulse-classic
 
 | DEB | RPM | Arch | Total |
 | ---: | ---: | ---: | ---: |
-| **166** | **49** | **6** | **221** |
+| **168** | **50** | **6** | **224** |
 
 _Updated automatically every day by the `Update download stats` workflow._
 <!-- DOWNLOAD-STATS:END -->
