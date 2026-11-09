@@ -350,6 +350,7 @@ class InstallerCard(QFrame):
         self._apply_state_label()
 
         ui = app.get("ui", {})
+        self.check.setEnabled(any(ui.get(action) for action in ("can_install", "can_remove", "can_update")))
         self.install_btn.setEnabled(bool(ui.get("can_install")))
         self.remove_btn.setEnabled(bool(ui.get("can_remove")))
         self.update_btn.setEnabled(bool(ui.get("can_update")))
