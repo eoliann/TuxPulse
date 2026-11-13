@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Salveaza totalul de descarcari al release-urilor si genereaza graficul SVG."""
+"""Record total release downloads and render the SVG chart."""
 import json, os, sys, urllib.request
 from datetime import datetime, timezone
 
@@ -27,7 +27,7 @@ while True:
     page += 1
 releases = [r for r in releases if not r.get("draft")]
 if not releases:
-    sys.exit("Niciun release.")
+    sys.exit("No releases.")
 total = sum(a["download_count"] for r in releases for a in r["assets"])
 first = min(r["published_at"] or r["created_at"] for r in releases)[:10]
 
@@ -66,7 +66,7 @@ dots = "".join(f'<circle cx="{X(h["d"]):.1f}" cy="{Y(h["n"]):.1f}" r="{3 if len(
 area = f'<polygon points="{L if len(hist)>1 else X(hist[0]["d"]):.1f},{H-B} {pts} {X(hist[-1]["d"]):.1f},{H-B}" class="a"/>' if len(hist) > 1 else ""
 line = f'<polyline points="{pts}" fill="none" class="ln"/>' if len(hist) > 1 else ""
 xl = f'<text x="{L}" y="{H-12}" class="t">{hist[0]["d"]}</text><text x="{W-R}" y="{H-12}" class="t" text-anchor="end">{hist[-1]["d"]}</text>'
-svg = f'''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}" width="{W}" height="{H}" role="img" aria-label="Progres descarcari">
+svg = f'''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}" width="{W}" height="{H}" role="img" aria-label="Download progress">
 <style>
 .t{{font:12px -apple-system,Segoe UI,Helvetica,Arial,sans-serif;fill:#57606a}}
 .h{{font:600 15px -apple-system,Segoe UI,Helvetica,Arial,sans-serif;fill:#1f2328}}
@@ -75,9 +75,9 @@ svg = f'''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}" width="{
 @media (prefers-color-scheme:dark){{.t{{fill:#9198a1}}.h{{fill:#f0f6fc}}.g{{stroke:#3d444d}}.ln{{stroke:#4493f8}}.l{{fill:#4493f8}}.a{{fill:#4493f8}}.bg{{fill:#0d1117;stroke:#3d444d}}}}
 </style>
 <rect x=".5" y=".5" width="{W-1}" height="{H-1}" rx="8" class="bg"/>
-<text x="{L}" y="26" class="h">Progres descărcări · {total:,} total</text>
-<text x="{L}" y="44" class="t">De la primul release ({first}) · {len(releases)} release-uri · actualizat zilnic</text>
+<text x="{L}" y="26" class="h">Download progress · {total:,} total</text>
+<text x="{L}" y="44" class="t">Since first release ({first}) · {len(releases)} releases · updated daily</text>
 {grid}{area}{line}{dots}{xl}
 </svg>'''
 open(svg_path, "w", encoding="utf-8").write(svg)
-print(repo, total, "descarcari,", len(hist), "puncte")
+print(repo, total, "downloads,", len(hist), "points")
