@@ -15,6 +15,8 @@
 ![Lang](https://img.shields.io/badge/Lang-Python-magenta?style=plastic)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg?style=plastic)](LICENSE.md)
 
+<p align="center"><img src=".github/downloads/chart.svg" alt="Progres descărcări" width="760"></p>
+
 
 # TuxPulse
 
