@@ -18,19 +18,19 @@
 <details open>
 <summary><b>Downloads · daily (cumulative)</b></summary>
 
-<img src=".github/downloads/chart.svg?v=20261116" alt="Daily download progress" width="760">
+<img src=".github/downloads/chart.svg?v=2026111602" alt="Daily download progress" width="760">
 
 </details>
 <details>
 <summary><b>Downloads · monthly</b></summary>
 
-<img src=".github/downloads/chart-monthly.svg?v=20261116" alt="Monthly downloads" width="760">
+<img src=".github/downloads/chart-monthly.svg?v=2026111602" alt="Monthly downloads" width="760">
 
 </details>
 <details>
 <summary><b>Downloads · yearly</b></summary>
 
-<img src=".github/downloads/chart-yearly.svg?v=20261116" alt="Yearly downloads" width="760">
+<img src=".github/downloads/chart-yearly.svg?v=2026111602" alt="Yearly downloads" width="760">
 
 </details>
 
