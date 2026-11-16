@@ -56,7 +56,7 @@ json.dump(hist, open(hp, "w"), separators=(",", ":"))
 pts = [(date.fromisoformat(h["d"]), h["n"], bool(h.get("e"))) for h in hist]
 est_until = max((d for d, _, e in pts if e), default=None)
 
-W, H, L, R, T, B = 760, 280, 56, 20, 62, 40
+W, H, L, R, T, B = 760, 290, 56, 20, 62, 52
 FONT = "-apple-system,Segoe UI,Helvetica,Arial,sans-serif"
 STYLE = f"""<style>
 .t{{font:12px {FONT};fill:#57606a}}.h{{font:600 15px {FONT};fill:#1f2328}}
@@ -110,7 +110,7 @@ def line_chart():
     for i in range(6):
         d = d0 + timedelta(days=round(span * i / 5))
         anchor = "start" if i == 0 else "end" if i == 5 else "middle"
-        body += f'<text x="{X(d):.1f}" y="{H-14}" class="t" text-anchor="{anchor}">{d.isoformat()}</text>'
+        body += f'<text x="{X(d):.1f}" y="{H-B+22}" class="t" text-anchor="{anchor}">{d.isoformat()}</text>'
     sub = f"Cumulative, daily · since first release with downloads ({start})"
     if est_until:
         sub += f" · dashed = estimated until {est_until}"
@@ -148,16 +148,21 @@ def bar_chart(kind):
     n = len(data)
     slot = (W - L - R) / n
     bw = min(slot * 0.7, 60)
-    every = max(1, math.ceil(n / 12))
+    rot = n > 12
     body = ""
     for i, (lab, v) in enumerate(data):
         x = L + slot * i + (slot - bw) / 2
+        cx = x + bw / 2
         y = Y(v, ymax)
-        body += f'<rect x="{x:.1f}" y="{y:.1f}" width="{bw:.1f}" height="{H-B-y:.1f}" rx="2" class="b"/>'
-        if n <= 14 and v:
-            body += f'<text x="{x+bw/2:.1f}" y="{y-5:.1f}" class="t" text-anchor="middle">{v:,}</text>'
-        if i % every == 0:
-            body += f'<text x="{x+bw/2:.1f}" y="{H-14}" class="t" text-anchor="middle">{lab}</text>'
+        body += f'<rect x="{x:.1f}" y="{y:.1f}" width="{bw:.1f}" height="{max(H-B-y, 0):.1f}" rx="2" class="b"/>'
+        if slot >= 26:
+            body += f'<text x="{cx:.1f}" y="{y-5:.1f}" class="t" text-anchor="middle">{v:,}</text>'
+        else:
+            body += f'<text transform="translate({cx+4:.1f},{y-5:.1f}) rotate(-90)" class="t" style="font-size:10px">{v:,}</text>'
+        if rot:
+            body += f'<text transform="translate({cx+4:.1f},{H-B+14}) rotate(-40)" class="t" text-anchor="end" style="font-size:11px">{lab}</text>'
+        else:
+            body += f'<text x="{cx:.1f}" y="{H-B+18}" class="t" text-anchor="middle">{lab}</text>'
     name = "Monthly" if kind == "month" else "Yearly"
     sub = f"New downloads per {kind} · since first release with downloads ({start})"
     if est_until:
