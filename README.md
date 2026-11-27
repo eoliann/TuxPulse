@@ -84,7 +84,7 @@ tuxpulse-classic
 
 | Release | Date | DEB | RPM | Arch | Total |
 | --- | --- | ---: | ---: | ---: | ---: |
-| [v5.5](https://github.com/eoliann/TuxPulse/releases/tag/v5.5) | 2026-11-09 | 6 | 3 | 2 | **11** |
+| [v5.5](https://github.com/eoliann/TuxPulse/releases/tag/v5.5) | 2026-11-09 | 7 | 3 | 2 | **12** |
 | [v5.4](https://github.com/eoliann/TuxPulse/releases/tag/v5.4) | 2026-10-27 | 5 | 5 | 3 | **13** |
 | [v5.3](https://github.com/eoliann/TuxPulse/releases/tag/v5.3) | 2026-10-27 | 6 | 3 | 3 | **12** |
 | [pr-v6.0.2](https://github.com/eoliann/TuxPulse/releases/tag/pr-v6.0.2) _(pre-release)_ | 2026-04-12 | 14 | 6 | 4 | **24** |
@@ -94,7 +94,7 @@ tuxpulse-classic
 
 | DEB | RPM | Arch | Total |
 | ---: | ---: | ---: | ---: |
-| **212** | **70** | **19** | **301** |
+| **213** | **70** | **19** | **302** |
 
 _Updated automatically every day by the `Update download stats` workflow._
 <!-- DOWNLOAD-STATS:END -->
